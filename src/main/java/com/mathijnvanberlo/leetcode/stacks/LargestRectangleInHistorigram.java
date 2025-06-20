@@ -4,29 +4,46 @@ import java.util.Stack;
 
 public class LargestRectangleInHistorigram {
     public int largestRectangleArea(int[] heights) {
-        Stack<int[]> heightIndexStack = new Stack<>();
-        heightIndexStack.push(new int[]{0, heights[0]});
-        int largestArea = heights[0];
+        Stack<HeightIndex> heightIndexStack = new Stack<>();
+        int largestArea = 0;
         int length = heights.length;
 
-        for (int i = 1; i < length; i++) {
-            if (heightIndexStack.peek()[1] > heights[i]) {
-                int[] nextHeightIndex;
-                do {
-                    nextHeightIndex = heightIndexStack.pop();
-                    largestArea = Math.max(largestArea, (i - nextHeightIndex[0]) * nextHeightIndex[1]);
-                } while (!heightIndexStack.isEmpty() && heightIndexStack.peek()[1] > heights[i]);
-                int index = nextHeightIndex[0];
-                heightIndexStack.push(new int[]{index, heights[i]});
-            } else {
-                heightIndexStack.push(new int[]{i, heights[i]});
+        for (int index = 0; index < length; index++) {
+            int nextIndex = index;
+            while (!heightIndexStack.isEmpty() &&
+                    heightIndexStack.peek().getHeight() > heights[index]) {
+                HeightIndex nextHeightIndex = heightIndexStack.pop();
+                largestArea = Math.max(largestArea, nextHeightIndex.calculateArea(index));
+                nextIndex = nextHeightIndex.getIndex();
             }
+            heightIndexStack.push(new HeightIndex(nextIndex, heights[index]));
         }
 
         while (!heightIndexStack.isEmpty()) {
-            int[] nextHeightIndex = heightIndexStack.pop();
-            largestArea = Math.max(largestArea, (length - nextHeightIndex[0]) * nextHeightIndex[1]);
+            HeightIndex nextHeightIndex = heightIndexStack.pop();
+            largestArea = Math.max(largestArea, nextHeightIndex.calculateArea(length));
         }
         return largestArea;
+    }
+
+    private class HeightIndex {
+        private final int index;
+        private final int height;
+        public HeightIndex(int index, int height) {
+            this.index = index;
+            this.height = height;
+        }
+
+        public int getIndex() {
+            return this.index;
+        }
+
+        public int getHeight() {
+            return this.height;
+        }
+
+        public int calculateArea(int index) {
+            return (index - this.index) * this.height;
+        }
     }
 }
