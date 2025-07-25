@@ -26,4 +26,16 @@ public class ListNode {
         }
         return node;
     }
+
+    public void CreateCycle(int position) {
+
+        ListNode linkedFromEnd = this;
+        while (--position >= 0) linkedFromEnd = linkedFromEnd.next;
+
+        ListNode lastNode = linkedFromEnd.next;
+        while (lastNode.next != null) lastNode = lastNode.next;
+
+        lastNode.next = linkedFromEnd;
+
+    }
 }
